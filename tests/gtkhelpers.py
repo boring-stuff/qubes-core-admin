@@ -110,7 +110,7 @@ class VMListModelerTest(VMListModelerMock, unittest.TestCase):
         list_exc = ["test-disp6", "test-red2"]
 
         self.apply_model(Gtk.ComboBox(),
-            [VMListModeler.ExcludeNameFilter(list_exc[0], list_exc[1])])
+            [VMListModeler.NameBlacklistFilter(list_exc[0], list_exc[1])])
 
         for name in list_exc:
             mock = MockComboEntry(name)
@@ -152,21 +152,58 @@ class VMListModelerTest(VMListModelerMock, unittest.TestCase):
             with self.assertRaises(TypeError):
                 self.apply_model(invalid_type)
 
-    def test_apply_model_exclusions(self):
+    def test_apply_model_blacklist(self):
         combo = Gtk.ComboBox()
 
         self.apply_model(combo)
         self.assertEquals(7, len(combo.get_model()))
 
-        self.apply_model(combo, [   VMListModeler.ExcludeNameFilter(
+        self.apply_model(combo, [   VMListModeler.NameBlacklistFilter(
                                         self._entries.keys()[0]) ])
         self.assertEquals(6, len(combo.get_model()))
 
-        self.apply_model(combo, [   VMListModeler.ExcludeNameFilter(
+        self.apply_model(combo, [   VMListModeler.NameBlacklistFilter(
                                         self._entries.keys()[0]),
-                                    VMListModeler.ExcludeNameFilter(
+                                    VMListModeler.NameBlacklistFilter(
                                         self._entries.keys()[1]) ])
         self.assertEquals(5, len(combo.get_model()))
+
+        self.apply_model(combo, [   VMListModeler.NameBlacklistFilter(
+                                        self._entries.keys()[0],
+                                        self._entries.keys()[1]) ])
+        self.assertEquals(5, len(combo.get_model()))
+
+    def test_apply_model_whitelist(self):
+        combo = Gtk.ComboBox()
+
+        self.apply_model(combo)
+        self.assertEquals(7, len(combo.get_model()))
+
+        self.apply_model(combo, [   VMListModeler.NameWhitelistFilter(
+                                        self._entries.keys()[0]) ])
+        self.assertEquals(1, len(combo.get_model()))
+
+        self.apply_model(combo, [   VMListModeler.NameWhitelistFilter(
+                                        self._entries.keys()[0],
+                                        self._entries.keys()[1]) ])
+        self.assertEquals(2, len(combo.get_model()))
+
+    def test_apply_model_multiple_filters(self):
+        combo = Gtk.ComboBox()
+
+        self.apply_model(combo)
+        self.assertEquals(7, len(combo.get_model()))
+
+        self.apply_model(combo, [   VMListModeler.NameWhitelistFilter(
+                                        self._entries.keys()[0],
+                                        self._entries.keys()[1],
+                                        self._entries.keys()[2],
+                                        self._entries.keys()[3],
+                                        self._entries.keys()[4]  ),
+                                    VMListModeler.NameBlacklistFilter(
+                                        self._entries.keys()[0],
+                                        self._entries.keys()[1])])
+        self.assertEquals(3, len(combo.get_model()))
 
     def test_apply_icon(self):
         new_object = Gtk.Entry()

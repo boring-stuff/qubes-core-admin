@@ -158,8 +158,8 @@ class RPCConfirmationWindow():
         list_modeler = self._new_VM_list_modeler()
 
         list_modeler.apply_model(self._rpc_combo_box,
-                    [ VMListModeler.ExcludeNameFilter("dom0"),
-                      VMListModeler.ExcludeNameFilter(source) ],
+                    [ VMListModeler.NameBlacklistFilter("dom0"),
+                      VMListModeler.NameBlacklistFilter(source) ],
                     selection_trigger = self._update_ok_button_sensitivity,
                     activation_trigger = self._clicked_ok )
 
