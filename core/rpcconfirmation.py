@@ -116,6 +116,8 @@ class RPCConfirmationWindow():
 
         if len(partitioned[2]) > 0:
             formatted += "<b>" + partitioned[2] + "</b>"
+        else:
+            formatted = "<b>" + formatted + "</b>"
 
         return formatted
 

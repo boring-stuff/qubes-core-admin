@@ -104,13 +104,13 @@ class RPCConfirmationWindowTestBase(MockRPCConfirmationWindow, GtkTestCase):
                           self._escape_and_format_rpc_text("qubes.Test"))
         self.assertEquals("custom.<b>Domain</b>",
                           self._escape_and_format_rpc_text("custom.Domain"))
-        self.assertEquals("nodomain",
+        self.assertEquals("<b>nodomain</b>",
                           self._escape_and_format_rpc_text("nodomain"))
         self.assertEquals("domain.<b>Sub.Operation</b>",
                           self._escape_and_format_rpc_text("domain.Sub.Operation"))
-        self.assertEquals("",
+        self.assertEquals("<b></b>",
                           self._escape_and_format_rpc_text(""))
-        self.assertEquals(".",
+        self.assertEquals("<b>.</b>",
                           self._escape_and_format_rpc_text("."))
         self.assertEquals("inject.<b>&lt;script&gt;</b>",
                           self._escape_and_format_rpc_text("inject.<script>"))
