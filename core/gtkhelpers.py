@@ -47,9 +47,6 @@ class VMListModeler:
     def __init__(self):
         self._icon_getter = GtkIconGetter(16)
 
-        self._list = []
-        self._load_list()
-
         self._entries = {}
         self._create_entries()
 
@@ -57,23 +54,24 @@ class VMListModeler:
     def _get_icon(self, vm):
         return self._icon_getter.get_icon(vm.label.icon)
 
-    def _load_list(self):
+    def _get_list(self):
         collection = qubes.QubesVmCollection()
         try:
             collection.lock_db_for_reading()
 
             collection.load()
 
-            self._list = [vm for vm in collection.values()]
+            return [vm for vm in collection.values()]
         finally:
             collection.unlock_db()
 
     def _create_entries(self):
-        for vm in self._list:
+        for vm in self._get_list():
             icon = self._get_icon(vm)
 
             self._entries[vm.name] = {'qid': vm.qid,
-                                      'icon': icon}
+                                      'icon': icon,
+                                      'vm': vm}
 
 
     def _get_valid_qube_name(self, combo, entry_box, exclusions):
@@ -125,21 +123,21 @@ class VMListModeler:
             list_store = Gtk.ListStore(int, str, GdkPixbuf.Pixbuf)
 
             exclusions = []
-            for vm in self._list:
+            for vm_name in sorted(self._entries.iterkeys()):
+                entry = self._entries[vm_name]
+
                 matches = True
 
                 if vm_filter_list:
                     for vm_filter in vm_filter_list:
-                        if not vm_filter.matches(vm):
+                        if not vm_filter.matches(entry['vm']):
                             matches = False
                             break
 
                 if matches:
-                    entry = self._entries[vm.name]
-
-                    list_store.append([entry['qid'], vm.name, entry['icon']])
+                    list_store.append([entry['qid'], vm_name, entry['icon']])
                 else:
-                    exclusions += [vm.name]
+                    exclusions += [vm_name]
 
             destination_object.set_model(list_store)
             destination_object.set_id_column(1)

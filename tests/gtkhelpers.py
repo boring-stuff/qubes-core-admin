@@ -26,8 +26,8 @@ class VMListModelerMock(VMListModeler):
     def __init__(self):
         VMListModeler.__init__(self)
 
-    def _load_list(self):
-        self._list = [  MockVm(0, "dom0", "black"),
+    def _get_list(self):
+        return [  MockVm(0, "dom0", "black"),
                         MockVm(2, "test-red1", "red"),
                         MockVm(4, "test-red2", "red"),
                         MockVm(7, "test-red3", "red"),
@@ -91,8 +91,8 @@ class VMListModelerTest(VMListModelerMock, unittest.TestCase):
         unittest.TestCase.__init__(self, *args, **kwargs)
         VMListModelerMock.__init__(self)
 
-    def test_list_gets_loaded(self):
-        self.assertIsNotNone(self._list)
+    def test_entries_gets_loaded(self):
+        self.assertIsNotNone(self._entries)
 
     def test_valid_qube_name(self):
         self.apply_model(Gtk.ComboBox())
@@ -159,13 +159,13 @@ class VMListModelerTest(VMListModelerMock, unittest.TestCase):
         self.assertEquals(7, len(combo.get_model()))
 
         self.apply_model(combo, [   VMListModeler.ExcludeNameFilter(
-                                        self._list[0].name) ])
+                                        self._entries.keys()[0]) ])
         self.assertEquals(6, len(combo.get_model()))
 
         self.apply_model(combo, [   VMListModeler.ExcludeNameFilter(
-                                        self._list[0].name),
+                                        self._entries.keys()[0]),
                                     VMListModeler.ExcludeNameFilter(
-                                        self._list[1].name) ])
+                                        self._entries.keys()[1]) ])
         self.assertEquals(5, len(combo.get_model()))
 
     def test_apply_icon(self):
