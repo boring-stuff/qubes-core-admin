@@ -20,7 +20,7 @@
 #
 
 from . gtkhelpers import VMListModeler, FocusStealingHelper, glade_directory
-from gi.repository import Gtk, Gdk
+from gi.repository import Gtk, Gdk, GLib
 import os
 
 class RPCConfirmationWindow():
@@ -106,9 +106,12 @@ class RPCConfirmationWindow():
     def _can_perform_action(self):
         return self._focus_helper.can_perform_action()
 
-    def _format_rpc_text(self, rpc_operation):
-        partitioned = rpc_operation.partition('.')
+    def _escape_and_format_rpc_text(self, rpc_operation):
+        stripfun = lambda c: c if 32<=ord(c)<=126 else '_'
+        stripped = ''.join(stripfun(c) for c in rpc_operation)
+        escaped = GLib.markup_escape_text(stripped)
 
+        partitioned = escaped.partition('.')
         formatted = partitioned[0] + partitioned[1]
 
         if len(partitioned[2]) > 0:
@@ -147,7 +150,8 @@ class RPCConfirmationWindow():
 
         self._focus_helper = self._new_focus_stealing_helper()
 
-        self._rpc_label.set_markup(self._format_rpc_text(rpc_operation))
+        self._rpc_label.set_markup(
+                    self._escape_and_format_rpc_text(rpc_operation))
 
         list_modeler = self._new_VM_list_modeler()
 

@@ -99,19 +99,29 @@ class RPCConfirmationWindowTestBase(MockRPCConfirmationWindow, GtkTestCase):
         self.assertTrue(self.test_rpc_operation in
                             self._rpc_label.get_text())
 
-    def test_format_rpc_text(self):
+    def test_escape_and_format_rpc_text(self):
         self.assertEquals("qubes.<b>Test</b>",
-                            self._format_rpc_text("qubes.Test"))
+                          self._escape_and_format_rpc_text("qubes.Test"))
         self.assertEquals("custom.<b>Domain</b>",
-                            self._format_rpc_text("custom.Domain"))
+                          self._escape_and_format_rpc_text("custom.Domain"))
         self.assertEquals("nodomain",
-                            self._format_rpc_text("nodomain"))
+                          self._escape_and_format_rpc_text("nodomain"))
         self.assertEquals("domain.<b>Sub.Operation</b>",
-                            self._format_rpc_text("domain.Sub.Operation"))
+                          self._escape_and_format_rpc_text("domain.Sub.Operation"))
         self.assertEquals("",
-                            self._format_rpc_text(""))
+                          self._escape_and_format_rpc_text(""))
         self.assertEquals(".",
-                            self._format_rpc_text("."))
+                          self._escape_and_format_rpc_text("."))
+        self.assertEquals("inject.<b>&lt;script&gt;</b>",
+                          self._escape_and_format_rpc_text("inject.<script>"))
+        self.assertEquals("&lt;script&gt;.<b>inject</b>",
+                          self._escape_and_format_rpc_text("<script>.inject"))
+        self.assertEquals("utf8.<b>_1_2_3_4_5</b>",
+                          self._escape_and_format_rpc_text(
+                            u"utf8.\x011\x022\x033\x004\xFF5"))
+        self.assertEquals("utf8.<b>&lt;script&gt;</b>",
+                          self._escape_and_format_rpc_text(
+                            u"utf8.\x3c\x73\x63\x72\x69\x70\x74\x3e"))
 
     def test_hide_dom0_and_source(self):
         model = self._rpc_combo_box.get_model()
