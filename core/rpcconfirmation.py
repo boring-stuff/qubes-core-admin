@@ -198,14 +198,14 @@ class RPCConfirmationWindow():
         self._show()
 
         if self._confirmed:
-            return {    'target_name': self._target_name,
-                        'target_qid': self._target_qid
-                   }
+            return { 'name': self._target_name, 'qid': self._target_qid,
+                     'parameters': {} }
         else:
             return False
 
-def confirm_rpc(source, rpc_operation, target = None):
-    window = RPCConfirmationWindow(source, rpc_operation, target)
+def confirm_rpc(source, rpc_operation, target = None, name_whitelist = None):
+    window = RPCConfirmationWindow(source, rpc_operation, target,
+                                   name_whitelist = name_whitelist)
 
     return window.confirm_rpc()
 
