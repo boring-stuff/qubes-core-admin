@@ -128,7 +128,8 @@ class RPCConfirmationWindow():
 
         self._error_bar.connect("response", self._close_error)
 
-    def __init__(self, source, rpc_operation, target = None):
+    def __init__(self, source, rpc_operation, target = None,
+                    name_whitelist = None):
         self._gtk_builder = Gtk.Builder()
         self._gtk_builder.add_from_file(self._source_file)
         self._rpc_window = self._gtk_builder.get_object(
@@ -157,9 +158,11 @@ class RPCConfirmationWindow():
 
         list_modeler = self._new_VM_list_modeler()
 
-        list_modeler.apply_model(self._rpc_combo_box,
-                    [ VMListModeler.NameBlacklistFilter("dom0"),
-                      VMListModeler.NameBlacklistFilter(source) ],
+        domain_filters = [ VMListModeler.NameBlacklistFilter(["dom0", source]) ]
+        if name_whitelist != None:
+            domain_filters += [VMListModeler.NameWhitelistFilter(name_whitelist)]
+
+        list_modeler.apply_model(self._rpc_combo_box, domain_filters,
                     selection_trigger = self._update_ok_button_sensitivity,
                     activation_trigger = self._clicked_ok )
 

@@ -34,13 +34,29 @@ class MockRPCConfirmationWindow(RPCConfirmationWindow):
                     self._focus_stealing_seconds)
 
     def __init__(self, source, rpc_operation, target = None,
+                    name_whitelist = None,
                     focus_stealing_seconds = 1):
         self._focus_stealing_seconds = focus_stealing_seconds
 
-        RPCConfirmationWindow.__init__(self, source, rpc_operation, target)
+        RPCConfirmationWindow.__init__(self, source, rpc_operation, target,
+                                        name_whitelist = name_whitelist)
 
     def is_error_visible(self):
         return self._error_bar.get_visible()
+
+    def get_shown_domains(self):
+        model = self._rpc_combo_box.get_model()
+        model_iter = model.get_iter_first()
+        domains = []
+
+        while model_iter != None:
+            domain_name = model.get_value(model_iter, 1)
+
+            domains = domains + [domain_name]
+
+            model_iter = model.iter_next(model_iter)
+
+        return domains
 
 class RPCConfirmationWindowTestBase(MockRPCConfirmationWindow, GtkTestCase):
     def __init__(self, test_method, source_name = "test-source",
@@ -124,27 +140,10 @@ class RPCConfirmationWindowTestBase(MockRPCConfirmationWindow, GtkTestCase):
                             u"utf8.\x3c\x73\x63\x72\x69\x70\x74\x3e"))
 
     def test_hide_dom0_and_source(self):
-        model = self._rpc_combo_box.get_model()
+        domains = self.get_shown_domains()
 
-        self.assertIsNotNone(model)
-
-        model_iter = model.get_iter_first()
-        found_dom0 = False
-        found_source = False
-
-        while model_iter != None:
-            domain_name = model.get_value(model_iter, 1)
-
-            if domain_name == 'dom0':
-                found_dom0 = True
-            elif domain_name == self.test_source_name:
-                found_source = True
-
-            model_iter = model.iter_next(model_iter)
-
-
-        self.assertFalse(found_dom0)
-        self.assertFalse(found_source)
+        self.assertFalse('dom0' in domains)
+        self.assertFalse(self.test_source_name in domains)
 
     def test_lifecycle_open_select_ok(self):
         self._lifecycle_start(select_target = True)
@@ -288,6 +287,39 @@ class RPCConfirmationWindowTestWithTargetInvalid(unittest.TestCase):
     def assert_raises_error(self, expect, source, target):
         rpcWindow = MockRPCConfirmationWindow(source, "test.Operation", target)
         self.assertEquals(expect, rpcWindow.is_error_visible())
+
+class RPCConfirmationWindowTestWitelist(unittest.TestCase):
+    def __init__(self, *args, **kwargs):
+        unittest.TestCase.__init__(self, *args, **kwargs)
+
+    def test_no_domains(self):
+        self._assert_whitelist([],[])
+
+    def test_all_red_domains(self):
+        self._assert_whitelist(["test-red1", "test-red2", "test-red3"],
+                               ["test-red1", "test-red2", "test-red3"])
+
+    def test_all_red_domains_plus_nonexistent(self):
+        self._assert_whitelist(["test-red1", "test-red2", "test-red3",
+                                "test-blue1", "test-blue2", "test-blue3"],
+                               ["test-red1", "test-red2", "test-red3"])
+
+    def test_all_allowed_domains(self):
+        self._assert_whitelist(["test-red1", "test-red2", "test-red3",
+                                "test-target", "test-disp6", "test-source",
+                                "dom0"], ["test-red1", "test-red2", "test-red3",
+                                "test-target", "test-disp6"])
+
+    def _assert_whitelist(self, whitelist, expected):
+        rpcWindow = MockRPCConfirmationWindow("test-source", "test.Operation",
+                                              name_whitelist = whitelist)
+
+        domains = rpcWindow.get_shown_domains()
+
+        for domain in expected:
+            self.assertTrue(domain in domains)
+
+        self.assertEquals(len(expected), len(domains))
 
 if __name__=='__main__':
     test = False

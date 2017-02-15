@@ -207,18 +207,18 @@ class VMListModeler:
                     "Only expecting Gtk.Entry objects to want our icon.")
 
     class NameBlacklistFilter:
-        def __init__(self, *avoid_names):
-            self._avoid_names = avoid_names
+        def __init__(self, avoid_names_list):
+            self._avoid_names_list = avoid_names_list
 
         def matches(self, vm):
-            return vm.name not in self._avoid_names
+            return vm.name not in self._avoid_names_list
 
     class NameWhitelistFilter:
-        def __init__(self, *allow_names):
-            self._allow_names = allow_names
+        def __init__(self, allowed_names_list):
+            self._allowed_names_list = allowed_names_list
 
         def matches(self, vm):
-            return vm.name in self._allow_names
+            return vm.name in self._allowed_names_list
 
 class GtkOneTimerHelper:
     def __init__(self, wait_seconds):

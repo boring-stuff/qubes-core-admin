@@ -110,7 +110,7 @@ class VMListModelerTest(VMListModelerMock, unittest.TestCase):
         list_exc = ["test-disp6", "test-red2"]
 
         self.apply_model(Gtk.ComboBox(),
-            [VMListModeler.NameBlacklistFilter(list_exc[0], list_exc[1])])
+            [VMListModeler.NameBlacklistFilter([ list_exc[0], list_exc[1] ]) ])
 
         for name in list_exc:
             mock = MockComboEntry(name)
@@ -158,19 +158,19 @@ class VMListModelerTest(VMListModelerMock, unittest.TestCase):
         self.apply_model(combo)
         self.assertEquals(7, len(combo.get_model()))
 
-        self.apply_model(combo, [   VMListModeler.NameBlacklistFilter(
-                                        self._entries.keys()[0]) ])
+        self.apply_model(combo, [   VMListModeler.NameBlacklistFilter([
+                                        self._entries.keys()[0] ]) ])
         self.assertEquals(6, len(combo.get_model()))
 
-        self.apply_model(combo, [   VMListModeler.NameBlacklistFilter(
-                                        self._entries.keys()[0]),
-                                    VMListModeler.NameBlacklistFilter(
-                                        self._entries.keys()[1]) ])
+        self.apply_model(combo, [   VMListModeler.NameBlacklistFilter([
+                                        self._entries.keys()[0] ]),
+                                    VMListModeler.NameBlacklistFilter([
+                                        self._entries.keys()[1] ]) ])
         self.assertEquals(5, len(combo.get_model()))
 
-        self.apply_model(combo, [   VMListModeler.NameBlacklistFilter(
+        self.apply_model(combo, [   VMListModeler.NameBlacklistFilter([
                                         self._entries.keys()[0],
-                                        self._entries.keys()[1]) ])
+                                        self._entries.keys()[1] ]) ])
         self.assertEquals(5, len(combo.get_model()))
 
     def test_apply_model_whitelist(self):
@@ -179,13 +179,13 @@ class VMListModelerTest(VMListModelerMock, unittest.TestCase):
         self.apply_model(combo)
         self.assertEquals(7, len(combo.get_model()))
 
-        self.apply_model(combo, [   VMListModeler.NameWhitelistFilter(
-                                        self._entries.keys()[0]) ])
+        self.apply_model(combo, [   VMListModeler.NameWhitelistFilter([
+                                        self._entries.keys()[0] ]) ])
         self.assertEquals(1, len(combo.get_model()))
 
-        self.apply_model(combo, [   VMListModeler.NameWhitelistFilter(
+        self.apply_model(combo, [   VMListModeler.NameWhitelistFilter([
                                         self._entries.keys()[0],
-                                        self._entries.keys()[1]) ])
+                                        self._entries.keys()[1] ]) ])
         self.assertEquals(2, len(combo.get_model()))
 
     def test_apply_model_multiple_filters(self):
@@ -194,15 +194,15 @@ class VMListModelerTest(VMListModelerMock, unittest.TestCase):
         self.apply_model(combo)
         self.assertEquals(7, len(combo.get_model()))
 
-        self.apply_model(combo, [   VMListModeler.NameWhitelistFilter(
+        self.apply_model(combo, [   VMListModeler.NameWhitelistFilter([
                                         self._entries.keys()[0],
                                         self._entries.keys()[1],
                                         self._entries.keys()[2],
                                         self._entries.keys()[3],
-                                        self._entries.keys()[4]  ),
-                                    VMListModeler.NameBlacklistFilter(
+                                        self._entries.keys()[4] ]),
+                                    VMListModeler.NameBlacklistFilter([
                                         self._entries.keys()[0],
-                                        self._entries.keys()[1])])
+                                        self._entries.keys()[1] ]) ])
         self.assertEquals(3, len(combo.get_model()))
 
     def test_apply_icon(self):
