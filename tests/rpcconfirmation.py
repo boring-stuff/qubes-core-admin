@@ -33,13 +33,13 @@ class MockRPCConfirmationWindow(RPCConfirmationWindow):
                     self._rpc_ok_button,
                     self._focus_stealing_seconds)
 
-    def __init__(self, source, rpc_operation, target = None,
-                    name_whitelist = None,
-                    focus_stealing_seconds = 1):
+    def __init__(self, source, rpc_operation,
+                 name_whitelist = VMListModelerMock.get_name_whitelist(),
+                 target = None, focus_stealing_seconds = 1):
         self._focus_stealing_seconds = focus_stealing_seconds
 
-        RPCConfirmationWindow.__init__(self, source, rpc_operation, target,
-                                        name_whitelist = name_whitelist)
+        RPCConfirmationWindow.__init__(self, source, rpc_operation,
+                                       name_whitelist, target)
 
     def is_error_visible(self):
         return self._error_bar.get_visible()
@@ -60,7 +60,9 @@ class MockRPCConfirmationWindow(RPCConfirmationWindow):
 
 class RPCConfirmationWindowTestBase(MockRPCConfirmationWindow, GtkTestCase):
     def __init__(self, test_method, source_name = "test-source",
-                 rpc_operation = "test.Operation", target_name = None):
+                 rpc_operation = "test.Operation",
+                 name_whitelist = VMListModelerMock.get_name_whitelist(),
+                 target_name = None):
         GtkTestCase.__init__(self, test_method)
         self.test_source_name = source_name
         self.test_rpc_operation = rpc_operation
@@ -77,6 +79,7 @@ class RPCConfirmationWindowTestBase(MockRPCConfirmationWindow, GtkTestCase):
         MockRPCConfirmationWindow.__init__(self,
                                        self.test_source_name,
                                        self.test_rpc_operation,
+                                       name_whitelist,
                                        self.test_target_name,
                                        focus_stealing_seconds = self._test_time)
 
@@ -138,12 +141,6 @@ class RPCConfirmationWindowTestBase(MockRPCConfirmationWindow, GtkTestCase):
         self.assertEquals("utf8.<b>&lt;script&gt;</b>",
                           self._escape_and_format_rpc_text(
                             u"utf8.\x3c\x73\x63\x72\x69\x70\x74\x3e"))
-
-    def test_hide_dom0_and_source(self):
-        domains = self.get_shown_domains()
-
-        self.assertFalse('dom0' in domains)
-        self.assertFalse(self.test_source_name in domains)
 
     def test_lifecycle_open_select_ok(self):
         self._lifecycle_start(select_target = True)
@@ -285,10 +282,11 @@ class RPCConfirmationWindowTestWithTargetInvalid(unittest.TestCase):
         self.assert_raises_error(True, "test-source", "test-source")
 
     def assert_raises_error(self, expect, source, target):
-        rpcWindow = MockRPCConfirmationWindow(source, "test.Operation", target)
+        rpcWindow = MockRPCConfirmationWindow(source, "test.Operation",
+                                              target=target)
         self.assertEquals(expect, rpcWindow.is_error_visible())
 
-class RPCConfirmationWindowTestWitelist(unittest.TestCase):
+class RPCConfirmationWindowTestWhitelist(unittest.TestCase):
     def __init__(self, *args, **kwargs):
         unittest.TestCase.__init__(self, *args, **kwargs)
 
@@ -308,11 +306,12 @@ class RPCConfirmationWindowTestWitelist(unittest.TestCase):
         self._assert_whitelist(["test-red1", "test-red2", "test-red3",
                                 "test-target", "test-disp6", "test-source",
                                 "dom0"], ["test-red1", "test-red2", "test-red3",
-                                "test-target", "test-disp6"])
+                                "test-target", "test-disp6", "test-source",
+                                "dom0"])
 
     def _assert_whitelist(self, whitelist, expected):
         rpcWindow = MockRPCConfirmationWindow("test-source", "test.Operation",
-                                              name_whitelist = whitelist)
+                                              whitelist)
 
         domains = rpcWindow.get_shown_domains()
 
@@ -335,6 +334,7 @@ if __name__=='__main__':
     if window:
         print MockRPCConfirmationWindow("test-source",
                                         "qubes.Filecopy",
+                                        VMListModelerMock.get_name_whitelist(),
                                         "test-red1").confirm_rpc()
     elif test:
         unittest.main(argv = [sys.argv[0]])

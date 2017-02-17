@@ -35,6 +35,11 @@ class VMListModelerMock(VMListModeler):
                         MockVm(10, "test-target", "orange"),
                         MockVm(15, "test-disp6", "red", True) ]
 
+    @staticmethod
+    def get_name_whitelist():
+        return [ "test-red1", "test-red2", "test-red3",
+                 "test-target", "test-disp6" ]
+
 class MockVmLabel:
     def __init__(self, index, color, name, dispvm = False):
         self.index = index
