@@ -23,6 +23,7 @@ import qubes
 import gi, os
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk, Gdk, GdkPixbuf, GObject, GLib
+from . qubesutils import sanitize_domain_name
 
 glade_directory = os.path.join(os.path.dirname(__file__), "glade")
 
@@ -67,6 +68,8 @@ class VMListModeler:
 
     def _create_entries(self):
         for vm in self._get_list():
+            sanitize_domain_name(vm.name, assert_sanitized = True)
+
             icon = self._get_icon(vm)
 
             self._entries[vm.name] = {'qid': vm.qid,

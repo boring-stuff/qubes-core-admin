@@ -20,6 +20,7 @@
 #
 
 from . gtkhelpers import VMListModeler, FocusStealingHelper, glade_directory
+from . qubesutils import sanitize_domain_name, sanitize_service_name
 from gi.repository import Gtk, Gdk, GLib
 import os
 
@@ -127,6 +128,9 @@ class RPCConfirmationWindow():
         self._error_bar.connect("response", self._close_error)
 
     def __init__(self, source, rpc_operation, name_whitelist, target = None):
+        sanitize_domain_name(source, assert_sanitized = True)
+        sanitize_service_name(source, assert_sanitized = True)
+
         self._gtk_builder = Gtk.Builder()
         self._gtk_builder.add_from_file(self._source_file)
         self._rpc_window = self._gtk_builder.get_object(
