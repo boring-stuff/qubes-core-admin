@@ -135,12 +135,6 @@ class RPCConfirmationWindowTestBase(MockRPCConfirmationWindow, GtkTestCase):
                           self._escape_and_format_rpc_text("inject.<script>"))
         self.assertEquals("&lt;script&gt;.<b>inject</b>",
                           self._escape_and_format_rpc_text("<script>.inject"))
-        self.assertEquals("utf8.<b>_1_2_3_4_5</b>",
-                          self._escape_and_format_rpc_text(
-                            u"utf8.\x011\x022\x033\x004\xFF5"))
-        self.assertEquals("utf8.<b>&lt;script&gt;</b>",
-                          self._escape_and_format_rpc_text(
-                            u"utf8.\x3c\x73\x63\x72\x69\x70\x74\x3e"))
 
     def test_lifecycle_open_select_ok(self):
         self._lifecycle_start(select_target = True)

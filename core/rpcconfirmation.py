@@ -107,9 +107,7 @@ class RPCConfirmationWindow():
         return self._focus_helper.can_perform_action()
 
     def _escape_and_format_rpc_text(self, rpc_operation):
-        stripfun = lambda c: c if 32<=ord(c)<=126 else '_'
-        stripped = ''.join(stripfun(c) for c in rpc_operation)
-        escaped = GLib.markup_escape_text(stripped)
+        escaped = GLib.markup_escape_text(rpc_operation)
 
         partitioned = escaped.partition('.')
         formatted = partitioned[0] + partitioned[1]
